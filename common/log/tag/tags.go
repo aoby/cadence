@@ -271,6 +271,11 @@ func WorkflowEventCount(eventCount int) Tag {
 	return newInt("wf-event-count", eventCount)
 }
 
+// PayloadSize returns tag for WorkflowSize
+func PayloadSize(payloadSize int64) Tag {
+	return newInt64("payload-size", payloadSize)
+}
+
 ///////////////////  System tags defined here:  ///////////////////
 // Tags with pre-define values
 

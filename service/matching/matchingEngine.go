@@ -446,6 +446,19 @@ pollLoop:
 // QueryWorkflow creates a DecisionTask with query data, send it through sync match channel, wait for that DecisionTask
 // to be processed by worker, and then return the query result.
 func (e *matchingEngineImpl) QueryWorkflow(ctx context.Context, queryRequest *m.QueryWorkflowRequest) (*workflow.QueryWorkflowResponse, error) {
+	// TODO debugging
+	deadline, ok := ctx.Deadline()
+	domainEntry, err := e.domainCache.GetDomainByID(queryRequest.GetDomainUUID())
+	if err == nil {
+		if ok {
+			e.logger.Info("query workflow",
+				tag.WorkflowDomainName(domainEntry.GetInfo().Name),
+				tag.WorkflowPollContextTimeout(deadline.Sub(time.Now())),
+			)
+		}
+	}
+	// TODO debugging
+
 	domainID := queryRequest.GetDomainUUID()
 	taskListName := queryRequest.TaskList.GetName()
 	taskListKind := common.TaskListKindPtr(queryRequest.TaskList.GetKind())
@@ -552,6 +565,16 @@ func (e *matchingEngineImpl) deliverQueryResult(taskID string, queryResult *quer
 }
 
 func (e *matchingEngineImpl) RespondQueryTaskCompleted(ctx context.Context, request *m.RespondQueryTaskCompletedRequest) error {
+	// TODO debugging
+	domainEntry, err := e.domainCache.GetDomainByID(request.GetDomainUUID())
+	if err == nil {
+		e.logger.Info("respond query task completed",
+			tag.WorkflowDomainName(domainEntry.GetInfo().Name),
+			tag.PayloadSize(int64(len(request.GetCompletedRequest().GetQueryResult()))),
+		)
+	}
+	// TODO debugging
+
 	if *request.CompletedRequest.CompletedType == workflow.QueryTaskCompletedTypeFailed {
 		e.deliverQueryResult(request.GetTaskID(), &queryResult{err: errors.New(request.CompletedRequest.GetErrorMessage())})
 	} else {
