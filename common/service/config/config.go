@@ -188,6 +188,16 @@ type (
 		MaxQPS int `yaml:"maxQPS"`
 		// MaxConns is the max number of connections to this datastore for a single keyspace
 		MaxConns int `yaml:"maxConns"`
+		// TLS configuration. When present, TLS is enabled. Additional options can be provided in the struct
+		TLS *TLS `yaml.tls`
+	}
+
+	// TLS client settings. When this struct is present, TLS is enabled. Individual settings are optional as noted
+	TLS struct {
+		// Optional path to a TLS client certificate
+		CertPath string `yaml:"certPath"`
+		// Optional path to the key file for a TLS client certificate
+		KeyPath string `yaml:"keyPath"`
 	}
 
 	// SQL is the configuration for connecting to a SQL backed datastore
